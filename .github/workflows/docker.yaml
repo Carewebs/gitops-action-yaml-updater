@@ -33,4 +33,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/loveholidays/gitops-action-yaml-updater:${{ steps.current-job.outputs.VERSION }}
+          tags: ghcr.io/ericrsilva/gitops-action-yaml-updater:${{ steps.current-job.outputs.VERSION }}

@@ -23,7 +23,7 @@ Default `""`
 ### `files`
 **Required** The name of the file that holds the container image name
 
-Expects relative path from the current working directory. 
+Expects relative path from the current working directory.
 
 Multiple files can be specified comma separated, i.e. `overlays/development-eu/packages/deployment-de.yaml,overlays/development-eu/packages/deployment-gb.yaml,kustomize-base/packages/deployment-ie.yaml`.
 
@@ -34,22 +34,22 @@ If action/checkout is used it is assumed that working directory is in the root o
 ### `new-image-tag`
 **Optional** The value of the new image tag
 
-If IMAGE_TAG is selected this is a mandatory value. 
+If IMAGE_TAG is selected this is a mandatory value.
 You can populate this value with the current repo short sha.
 Hint make sure that you have a previous step where you checkout the intended repo ( either the one for this workflow or other )
-and calculate and export the short sha using 
+and calculate and export the short sha using
 `run: echo "::set-output name=GITHUB_SHORT_SHA::$(git rev-parse --short "$GITHUB_SHA") "` and use that output in your step
 `new-image-tag: ${{ steps.your-previous-step-id.outputs.GITHUB_SHORT_SHA }}`
- 
+
  Default `""`
 ### `env-name`
-**Optional** The name of the env key that is present in the container form the specified file 
+**Optional** The name of the env key that is present in the container form the specified file
 
 Default `""`
 
 ### `new-env-value`
 **Optional** The new value for the env-name present in the container-name
- 
+
 Default `""`
 
 
@@ -59,29 +59,26 @@ none
 ## Example usage
 
       - name: Update image tag for container nginx in deployment.yaml
-        uses: loveholidays/gitops-action-yaml-updater@v1.0
+        uses: Carewebs/gitops-action-yaml-updater@master
         with:
           mode: IMAGE_TAG
           container-name: nginx
           new-image-tag: prod-${{ steps.your-previous-step-id.outputs.GITHUB_SHORT_SHA }}
-          dir: overlays/development-eu
-          files: deployment.yaml
+          filepath: overlays/development-eu/deployment.yaml
 
       - name: Update image tag for container bridge in two files
-        uses: loveholidays/gitops-action-yaml-updater@v1.0
+        uses: Carewebs/gitops-action-yaml-updater@master
         with:
           mode: IMAGE_TAG
           container-name: nginx
           new-image-tag: prod-${{ steps.your-previous-step-id.outputs.GITHUB_SHORT_SHA }}
-          dir: kustomize-base
-          files: "web/bridge/deployment.yaml,web/bridge-api/deployment.yaml"
+          filepath: "kustomize-base/web/bridge/deployment.yaml,web/bridge-api/deployment.yaml"
 
       - name: Update MY_GITHUB_SHORT_SHA env value for nginx container
-        uses: loveholidays/gitops-action-yaml-updater@v1.0
+        uses: Carewebs/gitops-action-yaml-updater@master
         with:
           mode: ENV_VAR
           container-name: nginx
           env-name: MY_GITHUB_SHORT_SHA
           new-env-value: ${{ steps.your-previous-step-id.outputs.GITHUB_SHORT_SHA }}
-          dir: overlays/development-eu
-          files: deployment.yaml
+          filepath: overlays/development-eu/deployment.yaml
