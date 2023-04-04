@@ -40,7 +40,7 @@ for FILEPATH in $FILES; do
     fi
 
     if [[ ${objectKind} == "Deployment" ]] || [[ ${objectKind} == "StatefulSet" ]] ; then
-      containerPosition=$(yq -r  .metadata.template.spec.containers[].name ${FILEPATH} | grep -n ${CONTAINER_NAME}$ | cut -d: -f1)
+      containerPosition=$(yq -r  .spec.template.spec.containers[].name ${FILEPATH} | grep -n ${CONTAINER_NAME}$ | cut -d: -f1)
       containerIndex=$((${containerPosition/M/}-1))
       if (( ${containerIndex} < 0 )) ; then
         echo " +++++++++ ERROR container with name ${CONTAINER_NAME} could not be found in file  ${FILEPATH}" >&2
@@ -48,7 +48,7 @@ for FILEPATH in $FILES; do
       fi
 
       echo " +++ + Container Index $containerIndex"
-      currentImageValue=$(yq -r  .metadata.template.spec.containers[${containerIndex}].image ${FILEPATH} )
+      currentImageValue=$(yq -r  .spec.template.spec.containers[${containerIndex}].image ${FILEPATH} )
       if [[ ${currentImageValue} == "null" ]]; then
         echo " +++++++++ ERROR Cannot find image field for container named  ${CONTAINER_NAME} in file ${FILEPATH} " >&2
         exit 1
@@ -96,10 +96,10 @@ for FILEPATH in $FILES; do
       kustomizeImageNameToUpdate=""
       while [[ $s ]]; do
           object="${s%%"$delimiter"*}"
-          containerPosition=$(echo "$object" | yq -r .metadata.template.spec.containers[].name | grep -n ${CONTAINER_NAME}$ | cut -d: -f1)
+          containerPosition=$(echo "$object" | yq -r spec.template.spec.containers[].name | grep -n ${CONTAINER_NAME}$ | cut -d: -f1)
           if [[ $containerPosition ]]; then
             containerIndex=$((${containerPosition/M/}-1))
-            currentImageValue=$(echo "$object" | yq -r .metadata.template.spec.containers[${containerIndex}].image)
+            currentImageValue=$(echo "$object" | yq -r .spec.template.spec.containers[${containerIndex}].image)
             if [[ ! $currentImageValue ]]; then
               currentImageValue=$(echo "$object" | yq -r .spec.jobTemplate.spec.template.spec.containers[${containerIndex}].image)
             fi
@@ -137,7 +137,7 @@ for FILEPATH in $FILES; do
     fi
 
     if [[ ${objectKind} == "Deployment" ]] || [[ ${objectKind} == "StatefulSet" ]] ; then
-      containerPosition=$(yq -r ${FILEPATH} .metadata.template.spec.containers[].name | grep -n ${CONTAINER_NAME}$ | cut -d: -f1)
+      containerPosition=$(yq -r ${FILEPATH} .spec.template.spec.containers[].name | grep -n ${CONTAINER_NAME}$ | cut -d: -f1)
       containerIndex=$((${containerPosition/M/}-1))
       if (( ${containerIndex} < 0 )); then
         echo " +++++++++ ERROR container with name ${CONTAINER_NAME} could not be found in file  ${FILEPATH}" >&2
@@ -145,13 +145,13 @@ for FILEPATH in $FILES; do
       fi
 
       echo " +++ + Container Index $containerIndex"
-      envPosition=$(yq -r  .metadata.template.spec.containers[${containerIndex}].env[].name  ${FILEPATH}| grep -n ${ENV_NAME}$ | cut -d: -f1)
+      envPosition=$(yq -r  .spec.template.spec.containers[${containerIndex}].env[].name  ${FILEPATH}| grep -n ${ENV_NAME}$ | cut -d: -f1)
       envIndex=$((${envPosition/M/}-1))
       if (( ${envIndex} < 0 )); then
         echo " +++++++++ ERROR Environment variable with name ${ENV_NAME} not found in ${CONTAINER_NAME}" >&2
         exit 1
       fi
-      currentEnvValue=$(yq -r  .metadata.template.spec.containers[${containerIndex}].env[${envIndex}].value ${FILEPATH})
+      currentEnvValue=$(yq -r  .spec.template.spec.containers[${containerIndex}].env[${envIndex}].value ${FILEPATH})
 
       echo " +++ + + Updating ${ENV_NAME} in container ${CONTAINER_NAME} from ${currentEnvValue}"
       echo " +++ + + To env   ${ENV_NAME} in container ${CONTAINER_NAME} to   ${NEW_ENV_VALUE}"
