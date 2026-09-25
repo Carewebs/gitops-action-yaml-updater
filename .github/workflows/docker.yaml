@@ -8,6 +8,9 @@ on:
     tags:
       - "v*.*.*"
 
+env:
+  DOCKER_BUILD_RECORD_UPLOAD: false
+
 jobs:
   docker:
     runs-on: ubuntu-latest
